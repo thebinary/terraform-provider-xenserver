@@ -33,11 +33,12 @@ import (
 )
 
 const (
-	vifSchemaNetworkUUID = "network_uuid"
-	vifSchemaMac         = "mac"
-	vifSchemaMtu         = "mtu"
-	vifSchemaDevice      = "device"
-	vifSchemaOtherConfig = "other_config"
+	vifSchemaNetworkUUID  = "network_uuid"
+	vifSchemaMac          = "mac"
+	vifSchemaGeneratedMac = "generated_mac"
+	vifSchemaMtu          = "mtu"
+	vifSchemaDevice       = "device"
+	vifSchemaOtherConfig  = "other_config"
 )
 
 func readVIFsFromSchema(c *Connection, s []interface{}) ([]*VIFDescriptor, error) {
@@ -89,11 +90,12 @@ func fillVIFSchema(vif VIFDescriptor) map[string]interface{} {
 		mac = vif.MAC
 	}
 	return map[string]interface{}{
-		vifSchemaNetworkUUID: vif.Network.UUID,
-		vifSchemaMac:         mac,
-		vifSchemaMtu:         vif.MTU,
-		vifSchemaDevice:      vif.DeviceOrder,
-		vifSchemaOtherConfig: vif.OtherConfig,
+		vifSchemaNetworkUUID:  vif.Network.UUID,
+		vifSchemaMac:          mac,
+		vifSchemaGeneratedMac: vif.MAC,
+		vifSchemaMtu:          vif.MTU,
+		vifSchemaDevice:       vif.DeviceOrder,
+		vifSchemaOtherConfig:  vif.OtherConfig,
 	}
 }
 
@@ -192,6 +194,11 @@ func resourceVIF() *schema.Resource {
 			vifSchemaMac: &schema.Schema{
 				Type:     schema.TypeString,
 				Optional: true,
+			},
+			vifSchemaGeneratedMac: &schema.Schema{
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 			},
 			vifSchemaMtu: &schema.Schema{
 				Type:     schema.TypeInt,

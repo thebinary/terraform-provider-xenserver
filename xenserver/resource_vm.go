@@ -300,13 +300,20 @@ func resourceVMCreate(d *schema.ResourceData, m interface{}) error {
 		return err
 	}
 
-	for _, vif := range vifs {
+	dvifs := make([]map[string]interface{}, len(vifs))
+	for i, vif := range vifs {
 		vif.VM = vm
-		if vif, err = createVIF(c, vif); err != nil {
+		dvif, err := createVIF(c, vif)
+		if err != nil {
 			log.Println("[ERROR] ", err)
 			return err
 		}
+
+		vif.MAC = dvif.MAC
+		dvifs[i] = fillVIFSchema(*vif)
 	}
+	// Update vmSchemaNetworkInterfaces for updated MAC in state
+	d.Set(vmSchemaNetworkInterfaces, dvifs)
 	d.SetPartial(vmSchemaNetworkInterfaces)
 
 	log.Println("[DEBUG] Creating CDs")
